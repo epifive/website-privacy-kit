@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Contact form — e2e fixture</title>
+</head>
+<body>
+<h1>Book an appointment</h1>
+<form id="enquiry">
+  <label>Name <input name="name"></label>
+  <label>Email <input name="email" type="email"></label>
+  <button type="submit">Send</button>
+</form>
+<p id="result"></p>
+<script src="{{APP}}/w.js" data-site="{{PK}}" async></script>
+<script>
+  var form = document.getElementById("enquiry");
+  form.addEventListener("submit", function (e) { e.preventDefault(); });
+  form.addEventListener("wpk:form", function (e) { window.__formResult = e.detail; document.getElementById("result").textContent = "sent"; });
+  (function wait() {
+    if (!window.wpk) return setTimeout(wait, 20);
+    wpk.form(form, { purposes: ["marketing_whatsapp"], subject: "email", primary: "appointments" });
+  })();
+</script>
+</body>
+</html>

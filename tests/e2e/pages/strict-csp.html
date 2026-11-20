@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Strict CSP page (e2e fixture)</title>
+<script nonce="{{NONCE}}">
+  window.__violations = [];
+  document.addEventListener("securitypolicyviolation", (e) => window.__violations.push(e.violatedDirective + " " + e.blockedURI));
+</script>
+</head>
+<body>
+<h1>A shop with a strict Content-Security-Policy</h1>
+<p>No inline styles or scripts are allowed here except scripts carrying the page's nonce.</p>
+<script type="text/plain" data-wpk-purpose="analytics" nonce="{{NONCE}}">window.__gated = 1;</script>
+<script src="{{APP}}/w.js" data-site="{{PK}}" nonce="{{NONCE}}" async></script>
+</body>
+</html>

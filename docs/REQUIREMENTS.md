@@ -1,0 +1,105 @@
+# Requirement matrix (legal requirement → test IDs)
+
+Source: the EpiFive design plan for this kit, §2.2 (legal requirement → feature map) and §10 (test plan). Code comments that say "plan §x" or "Mx" refer to that plan; the requirement IDs below are what the tests use.
+This file is the contract between the legal requirements and the automated tests: every
+requirement ID has one or more test IDs, and every automated test names the IDs it covers in
+its `describe`/`it` title so `npm test` output can be traced back here.
+
+**Not legal advice.** The wording below paraphrases the official texts for engineering purposes.
+Templates and interpretations are drafts pending lawyer review.
+
+Status legend: **auto** = automated test exists and passes · **planned** = test written in the
+phase shown · **n/a** = no product feature (guidance or out of scope).
+
+## Notice (Act s.5, s.6(3); Rule 3)
+
+| Req | Requirement (short) | Source | Test IDs | Test file | Phase | Status |
+|---|---|---|---|---|---|---|
+| N1 | Notice accompanies/precedes every consent request; states (i) personal data + purpose, (ii) how to withdraw and raise grievances, (iii) how to complain to the Board | Act s.5(1) | N1-01 every purpose lists its data items; N1-02 withdraw link present; N1-03 grievance contact + link present; N1-04 Board complaint text present; N1-05 publish refused when any of these is missing | `tests/notice.test.ts` | P2 | auto |
+| N2 | Notice is understandable independently; itemised description of personal data; specified purposes and description of goods/services | Rule 3(a), 3(b)(i)–(ii) | N2-01 standalone (no external scripts, styles, images or iframes; no "see our policy" dependency); N2-02 each data item rendered as its own list item; N2-03 goods/services description present; N2-04 purpose without items cannot be published | `tests/notice.test.ts` | P2 | auto |
+| N3 | Particular communication link for the website/app; means to withdraw with ease comparable to giving consent, to exercise rights, and to complain to the Board | Rule 3(c) | N3-01 links to `/p/{org}/withdraw`, `/p/{org}/rights` and the notice page are auto-inserted; N3-02 website URL included; N3-03 Board link/text included; N3-04 withdraw clicks ≤ grant clicks (banner) | `tests/notice.test.ts`; `tests/e2e/consent.e2e.test.ts` | P2 (N3-01..03), P3 (N3-04) | auto |
+| N4 | Option to read the notice in English or an Eighth Schedule language; clear and plain language; DPO/authorised person contact in every consent request | Act s.5(3), s.6(3) | N4-01 EN and HI versions are both produced on publish; N4-02 each version has its own SHA-256 and is immutable (update rejected, hash re-verifies); N4-03 HI text is Devanagari and contains no untranslated EN template sentences; N4-04 contact (grievance or DPO/authorised person) in both languages; N4-05 language recorded on consent events | `tests/notice.test.ts`; `tests/consent.test.ts`; e2e | P2 (01–04), P3 (05) | auto |
+| N5 | Pre-commencement consent: notice "as soon as reasonably practicable" (email, in-app, other) | Act s.5(2) | N5-01 legacy-customer message rendered for email, SMS and WhatsApp; N5-02 it contains the notice link and withdraw link | `tests/notice.test.ts` | P2 (renderer) | auto |
+
+## Consent (Act s.6)
+
+| Req | Requirement (short) | Source | Test IDs | Test file | Phase | Status |
+|---|---|---|---|---|---|---|
+| C1 | Free, specific, informed, unconditional, unambiguous, clear affirmative action; limited to necessary data | s.6(1) | C1-01 no pre-ticked toggles (banner and `wpk.form`); C1-02 Reject all present with same size/contrast as Accept all; C1-03 no "by continuing you agree" text anywhere (incl. the platform's own notice); C1-04 necessary purposes shown as non-toggle with basis; Esc/close never counts as consent | `tests/widget.test.ts`; `tests/consent.test.ts`; `tests/e2e/consent.e2e.test.ts` | P3 | auto |
+| C2 | Withdrawal at any time, as easy as giving; DF and processors cease within reasonable time | s.6(4), 6(6) | C2-01 withdraw event created; C2-02 `consent.withdrawn` listeners fired (owner email for identified people; webhook with S4); C2-03 gated scripts stop on next load; C2-04 signed withdraw link works without login, tampered token refused | `tests/consent.test.ts`; `tests/e2e/consent.e2e.test.ts` | P3 (webhook: S4/P7) | auto |
+| C3 | DF must prove notice and consent | s.6(10) | C3-01 every event carries notice version, language, channel; C3-02 hash chain verifies; C3-03 UPDATE/DELETE rejected by triggers and tamper of any row (changed, deleted, newest removed, forged) breaks verification; C3-04 CSV export contains the verified chain head; the evidence pack ZIP holds every notice version with its re-checked SHA-256, each consent log with the chain report and a manifest of file hashes | `tests/consent.test.ts`; `tests/exports.test.ts`; `tests/e2e/consent.e2e.test.ts`; `tests/e2e/p5.e2e.test.ts` | P3 (CSV), P5 (ZIP) | auto |
+| C4 | Consent Manager definition (registered, ₹2 cr net worth…) — **we are not one** | s.2(g); First Schedule | C4-01 no "Consent Manager" self-description in UI/SEO strings; C4-02 no cross-tenant read path (see T-ISO); C4-03 disclaimer present | `tests/base.test.ts`; `tests/tenant-isolation.test.ts` | P1–P2 | auto |
+
+## Rights (Act s.8(9), s.11–14; Rules 9, 14)
+
+| Req | Requirement (short) | Source | Test IDs | Test file | Phase | Status |
+|---|---|---|---|---|---|---|
+| R1 | Access summary incl. other DFs and processors shared with; correction, completion, updating, erasure; grievance; nomination | s.11–14 | R1-01 all request types accepted (access, correction, erasure, nomination, grievance, withdraw shortcut), verified by email code and acknowledged; R1-02 access answer lists data categories from the purposes register and every vendor from the vendor register; R1-03 a description is mandatory for corrections and grievances, and for access/erasure only when the organisation ticks them (organisation settings; shown on the hosted form) | `tests/rights.test.ts`; `tests/e2e/rights.e2e.test.ts` | P4, P5 (R1-03) | auto |
+| R2 | Publish means to make a request and the identifiers needed | Rule 14(1), 14(5) | R2-01 rights page (`/p/{org}/rights`) and hub (`/p/{org}`) list the identifiers configured in the questionnaire; R2-02 notice links to it | `tests/notice.test.ts` (R2-02); `tests/rights.test.ts`; e2e | P2 (R2-02), P4 | auto |
+| R3 | Response period ≤ 90 days (PIB: all request types) | Rule 14(3); PIB | R3-01 due = received + setting (clock runs from receipt, not verification); optional shorter internal target; R3-02 setting capped at 90 (questionnaire, profile and per request even if the stored value is higher); R3-03 reminders T−7, T−1 and overdue, each sent once | `tests/notice.test.ts` (R3-02 cap); `tests/rights.test.ts`; `tests/tenant-isolation.test.ts` (job) | P2 (cap), P4 | auto |
+| R4 | Publish DPO/authorised contact; mention it in every response | s.8(9); Rule 9 | R4-01 notice and hosted hub show the contact; R4-02 acknowledgement and every reply template carry the contact block, and an edited reply gets it back before sending | `tests/notice.test.ts` (R4-01); `tests/rights.test.ts`; e2e | P2, P4 | auto |
+| R5 | Exhaust DF grievance route before the Board | s.13(3) | R5-01 grievance closes only with an outcome (resolved / partly resolved / not upheld / withdrawn) and a closure letter that always carries the Board paragraph and the contact block | `tests/rights.test.ts` | P4 | auto |
+
+## Breach (Rule 7; CERT-In Directions)
+
+| Req | Requirement (short) | Source | Test IDs | Test file | Phase | Status |
+|---|---|---|---|---|---|---|
+| B1 | Tell each affected DP without delay: nature/extent/timing, consequences, mitigation, safety measures, contact | Rule 7(1) | B1-01 DP template (EN/HI) has sections (a)–(e), missing facts shown as […]; B1-02 recipients de-duplicated and encrypted, emailed through the logged mailer or marked as told by another channel, CSV export with the message; "without delay" elapsed clock until the first intimation | `tests/breach.test.ts`; `tests/e2e/p5.e2e.test.ts` | P5 | auto |
+| B2 | Board: initial "without delay" (incl. location); detailed report within 72 h with (i)–(vi) | Rule 7(2) | B2-01 72 h due computed from aware_at; IST input stored as UTC (midnight crossing tested); an extension the Board allowed moves the due time, never below 72 h; B2-02 report template (EN/HI) has (i)–(vi) with the (vi) count from the recipients; the initial intimation has nature, extent, timing, location and likely impact; extension request text; B2-03 elapsed clock for the initial intimation (amber after 1 h, red after 24 h — a reminder, not a legal limit) | `tests/breach.test.ts` | P5 | auto |
+| B3 | Any unauthorised processing is a breach; no threshold | s.2(u) | B3-01 register works on every plan (no plan check; tested with a Trial owner); insert-only timeline with encrypted evidence notes | `tests/breach.test.ts` | P5 | auto |
+| B4 | CERT-In: report Annexure I incidents within 6 h; ICT logs 180 days in India | CERT-In (ii), (iv) | B4-01 6 h timer from noticed_at (not aware_at), optional per incident; B4-02 CERT-In email to incident@cert-in.org.in with type, noticed time, systems and logs (180 days in India); reminders (due soon / overdue) by cron, each once, only to the organisation's owner and admins; dashboard banner on every page | `tests/breach.test.ts`; `tests/e2e/p5.e2e.test.ts` | P5 | auto |
+
+## Security, processors, retention (Rules 6, 8; s.8)
+
+| Req | Requirement (short) | Source | Test IDs | Test file | Phase | Status |
+|---|---|---|---|---|---|---|
+| S1 | Reasonable security safeguards (a)–(g) incl. logs 1 year and contract clause with processors | Rule 6(1) | S1-01 identifiers encrypted at rest (consent subjects P3; request name, email, details, nominee and attachments P4; breach recipients and evidence notes, parental contacts P5; dashboard users' 2FA secrets and recovery codes P7) under envelope encryption with wrapped, rotatable keys (SEC-KEY-01..04); S1-02 audit log and platform security log insert-only, deletes refused for rows younger than one year, log retention ≥ 365 days (SEC-LOG-01, OPS-LOG-01); S1-03 vendor register records security clause (f); access control: argon2id, 2FA for administrators, lockout, sessions, CSRF, strict CSP (SEC-*) — checklist in `docs/SECURITY.md` | `tests/registers.test.ts`; `tests/security.test.ts`; `tests/web-security.test.ts`; `tests/ops.test.ts`; `tests/e2e/p7.e2e.test.ts` | P2 (S1-03), P7 | auto |
+| P1 | Processor only under a valid contract; DF stays responsible | s.8(1), 8(2) | P1-01 vendor register stores contract status/date; P1-02 vendors without a contract are flagged in the dashboard | `tests/registers.test.ts` | P2 | auto |
+| E1 | Erase on withdrawal / purpose served, and cause processors to erase | s.8(7) | E1-01 retention rule per category, linked from purposes; every rule with a fixed period gets one open periodic erasure task (every 30 days, cut-off = due − period), signed off as done or skipped with a note (audited), daily reminders; E1-02 an erasure request creates a task for the business's own systems plus one per processor, with the processor erasure instruction text | `tests/registers.test.ts`; `tests/retention.test.ts` | P2 (rules), P5 (tasks) | auto |
+| E2 | Fixed periods + 48 h pre-erasure notice only for Third Schedule classes | Rule 8(1)–(2) | E2-01 questionnaire flags Third Schedule; E2-02 the optional pre-erasure notice is off by default (explained in the UI); when on, tasks carry a notice time (default 48 h) and the notice text (EN/HI), and sign-off waits until it was sent and its hours have passed | `tests/registers.test.ts`; `tests/retention.test.ts` | P2 (flag), P5 | auto |
+| E3 | Keep personal data, traffic data and logs ≥ 1 year (processor too) | Rule 8(3) | E3-01 retention rule shorter than 365 days for logs is rejected/warned; E3-02 purge before 1 year blocked: log erasure tasks cannot be signed off before the floor; the consent purge never deletes records younger than one calendar year (app check, checkpoint-insert trigger and delete-guard trigger); the consent retention setting (default 1,095 days) is clamped to ≥ 365 days | `tests/registers.test.ts`; `tests/retention.test.ts` | P2 (E3-01), P5 | auto |
+
+## Children (s.9; Rules 10, 12)
+
+| Req | Requirement (short) | Source | Test IDs | Test file | Phase | Status |
+|---|---|---|---|---|---|---|
+| K1 | Verifiable parental consent for under-18; no tracking/behavioural monitoring/targeted ads | s.9(1)–(3) | K1-01 children mode: the widget asks "18 or older?" first (equal buttons); under 18 nothing is sent and gated tags stay blocked; the server refuses under-18 choices and any tracking/analytics/ads grant for a known child; a parent can never switch those purposes on (flag or name rule); K1-02 notice adds the children section when children_mode is on | `tests/notice.test.ts` (K1-02); `tests/children.test.ts`; `tests/widget.test.ts`; `tests/e2e/consent.e2e.test.ts` | P2 (K1-02), P5 | auto |
+| K2 | Due diligence that parent is an identifiable adult | Rule 10 | K2-01 parental record logs the method (existing details → member check; year of birth proving 18+; in person; DigiLocker shown as not yet available), time, notice version and an evidence note — never an ID copy; one-time parent link (7 days), unticked declarations, decline and revoke (withdraw events) | `tests/children.test.ts`; `tests/e2e/p5.e2e.test.ts` | P5 | auto |
+| K3 | Fourth Schedule exemptions within conditions | Rule 12 | K3-01 questionnaire branch for clinics/education is informational only | `tests/registers.test.ts` | P2 | auto |
+
+## Out of scope / guidance only
+
+| Req | Note | Status |
+|---|---|---|
+| X1 | SDF duties — questionnaire excludes them | n/a |
+| X2 | Transfer abroad allowed subject to orders; India hosting is a choice | n/a (vendor register records location) |
+| X3 | Penalties — marketing tone only | n/a |
+| X4 | s.17(3) startup exemptions — none notified; never promise one | n/a (guardrail in copy) |
+
+## Cross-cutting tests
+
+| Test ID | What | Test file | Phase | Status |
+|---|---|---|---|---|
+| T-ISO-* | Every tenant query (orgs, sites, contacts, purposes, vendors, retention rules, notices, questionnaire answers, consent events/state/chain heads, rights requests, request events, attachments, nominations, mail log, breaches, breach events and recipients, erasure tasks, purge checkpoints, parental consents) returns nothing / throws for another org's ids; updates and deletes on another org's ids affect 0 rows; a request's verification token or a parent link does nothing in another organisation; the reminder jobs mail only each organisation's own people; the evidence pack holds only the caller's data | `tests/tenant-isolation.test.ts`; `tests/retention.test.ts`; `tests/exports.test.ts`; e2e | P2, P3 (T-ISO-10), P4 (T-ISO-11), P5 (T-ISO-12 breaches, T-ISO-13 retention, T-ISO-14 parental) | auto |
+| T-OTP-01 | Email code: stored only as a keyed hash; 5 wrong codes lock the request; codes expire after 15 min; resend has a 60 s cooldown and a maximum of 4 codes and replaces the old code | `tests/rights.test.ts`; e2e | P4 | auto |
+| T-RATE-01 | Rights form: at most 3 requests per email and 5 per IP address per hour per organisation; code checks 20 per IP per minute | `tests/rights.test.ts`; e2e | P4 | auto |
+| T-ATT-01 | Attachments optional; PDF/JPG/PNG by content sniffing; 3 files, 2 MB each, 5 MB total; AES-256-GCM at rest; download only for members, audited | `tests/rights.test.ts`; e2e | P4 | auto |
+| T-MAIL-01 | Every email (code, acknowledgement, replies, closure, reminders, owner withdrawal notice) goes through the mailer abstraction and leaves a mail_log row (sent / failed / skipped; recipient masked + HMAC; no body) | `tests/rights.test.ts`; e2e | P4 | auto |
+| T-TS-01 | Cloudflare Turnstile on the request form when keys are set; off without keys or with WPK_TURNSTILE=off; server-side check fails closed | `tests/rights.test.ts` | P4 | auto |
+| T-I18N-01 | Every interface key has a Hindi translation with the same placeholders | `tests/base.test.ts` | P1 | auto |
+| T-GUARD-01 | No "Consent Manager" self-description; no "compliant/certified/guaranteed" claims; disclaimer present | `tests/base.test.ts` | P1 | auto |
+| T-DB-01 | Migrations run on an empty SQLite database; social-proof tables absent | `tests/base.test.ts` | P1 | auto |
+| T-W-01 | Widget ≤ 10 KB gzip, Hindi chunk ≤ 3 KB gzip (build fails above) | `scripts/build-widget.mjs`; `tests/widget.test.ts` | P1, P3 | auto |
+| T-W-02 | No third-party requests and no cookies before a choice; Consent Mode v2 default denied → update; CORS allow-list per site; config ETag/304 | `tests/e2e/consent.e2e.test.ts` | P3 | auto |
+| T-PURGE-01 | Consent-record purge: separate maintenance route and secret (the cron secret is refused), dry run by default; deletes only the expired prefix of the chain and stops before an event that is still the proof of a granted consent; writes an insert-only checkpoint (tombstone) and an audit row; the chain still verifies from the checkpoint and tampering with the remaining rows is still detected; the database rejects deletes without a covering checkpoint and checkpoints younger than one year; archived sites stop collecting consent and can be deleted once all their records are past retention | `tests/retention.test.ts`; `tests/consent.test.ts`; `tests/e2e/p5.e2e.test.ts` | P5 | auto |
+| L-RC-01..08 | Readiness checker (`/readiness`, `/hi/readiness`): bank shape (5 profile + 23 scored, bands 0–100, EN/HI recommendations with rule refs), weighted score with N/A and `applies_if` removal, round half up, "Not sure" = 0, minimum answers, gap order (weight × (1 − multiplier), ties in bank order), flags never change the score, EN/HI parity, no compliance/Consent Manager claims; answers never leave the browser before the lead form | `tests/readiness.test.ts`; `tests/e2e/p6.e2e.test.ts` | P6 | auto |
+| L-NG-01..04 | Free notice generator (`/notice-generator`, no login): sector presets → renderer input, mailto: withdraw/rights links in place of hosted pages, EN+HI draft with the draft/not-legal-advice banner, standalone download, input escaped, response period capped at 90, nothing stored | `tests/free-notice.test.ts`; `tests/e2e/p6.e2e.test.ts` | P6 | auto |
+| L-SEO-01..05 | 13 guides (`/guides/<slug>`, `/hi/guides/<slug>`) from `content/guides`: front matter, TOC with unique ids, internal links rewritten, FAQPage JSON-LD, canonical + hreflang only where both languages exist, OG images, sitemap with alternates, robots; "not legal advice" on every page | `tests/guides.test.ts`; `tests/e2e/p6.e2e.test.ts` | P6 | auto |
+| MAIL-01..02 | Email: any SMTP server with STARTTLS (587) or SSL (465) and short timeouts; suppression list (never sent, logged as skipped) | `tests/mail.test.ts` | P7 | auto |
+| SEC-PW-01, SEC-LOCK-01, SEC-2FA-01..02, SEC-SESS-01, SEC-ADM-02, SEC-LOG-01, SEC-KEY-01..04, SEC-CSRF-01..04, SEC-CSP-01..03, SEC-RATE-01..02 | Security (plan §7.6): argon2id and scrypt migration; lockout; TOTP (RFC 6238 vectors, replay refused) and recovery codes; signed 2FA challenge; idle/absolute session timeouts; admins without 2FA redirected and refused; insert-only logs with a one-year floor; envelope encryption, legacy compatibility, org key rotation, master-key re-wrap round trip, production refuses without a key; CSRF origin and Fetch Metadata checks; strict nonce CSP (every script carries the nonce); rate limits incl. job-secret guessing | `tests/security.test.ts`; `tests/web-security.test.ts`; `tests/e2e/p7.e2e.test.ts` | P7 | auto |
+| OPS-GRANTS-01, OPS-KEYS-01..02, OPS-LOG-01, OPS-START-01, CRON-01 | Operations: MySQL grants list every table and keep insert-only tables SELECT/INSERT for the app user; `scripts/keys.mjs` shares the wrapping format and rotates/re-wraps a real database; log purge never under 365 days; usage alerts once per level and month; startup check; `/api/v1/cron/run` runs every job with `CRON_SECRET` only | `tests/ops.test.ts`; `tests/e2e/p7.e2e.test.ts` | P7 | auto |
+| DIGEST-01 | Daily chain-head email to the owner (plan §7.4): once per IST day after 07:00, only with new records, every website's last record number and SHA-256; off switch | `tests/closure.test.ts` | P8 | auto |
+| OPS-TRIG-01..02 | The 12 integrity triggers exist after the migrations; a missing one is reported (and re-created on MySQL) at start | `tests/ops.test.ts` | P8 | auto |
+| T-EXP-01 | Exports: register CSVs (requests with masked contacts, breaches, vendors, purposes, retention, erasure tasks), consent log CSV with the chain head, JSON proof (notice hashes + chain report); no other organisation's data | `tests/exports.test.ts` | P5 | auto |
+
+This is the Free (open-source) edition: one organisation, one website and one user; children mode is the age gate only (the parental-consent flow K2 and the evidence-pack ZIP are in the Pro edition). Rows for hosted billing, plans and account closure are not part of this repository.

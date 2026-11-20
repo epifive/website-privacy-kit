@@ -1,0 +1,17 @@
+# EpiFive Website Privacy Kit (Free edition) with SQLite.
+#   npm run setup                  # once: writes .env.local (master key + job secrets)
+#   docker compose up -d --build   # then open http://localhost:3000 and choose SQLite in the installer
+# MySQL instead: docker compose -f docker-compose.yml -f docker-compose.mysql.yml up -d --build
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
+    volumes:
+      - storage:/app/storage
+
+volumes:
+  storage:

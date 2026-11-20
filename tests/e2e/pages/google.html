@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Page with Google tags — e2e fixture</title>
+<!-- Google tag, gated on the "analytics" purpose (basic Consent Mode: nothing loads before consent). -->
+<script type="text/plain" data-wpk-purpose="analytics" async src="https://www.googletagmanager.com/gtag/js?id=G-TEST123"></script>
+<script type="text/plain" data-wpk-purpose="analytics">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-TEST123');
+  window.__analyticsRan = (window.__analyticsRan || 0) + 1;
+</script>
+<!-- A marketing pixel that must stay blocked (purpose not granted in the test). -->
+<script type="text/plain" data-wpk-purpose="marketing_whatsapp">window.__marketingRan = true;</script>
+</head>
+<body>
+<h1>Shop</h1>
+<iframe id="video" title="video" data-wpk-purpose="analytics" data-wpk-src="https://www.youtube-nocookie.com/embed/xyz" width="200" height="100"></iframe>
+<footer><a href="#" id="withdraw" data-wpk-withdraw>Withdraw consent</a></footer>
+<script src="{{APP}}/w.js" data-site="{{PK}}" async></script>
+</body>
+</html>

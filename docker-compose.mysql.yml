@@ -1,0 +1,21 @@
+# Optional MySQL 8.4 for EpiFive Website Privacy Kit. Use together with docker-compose.yml:
+#   docker compose -f docker-compose.yml -f docker-compose.mysql.yml up -d --build
+# Then choose MySQL in the installer: host db, port 3306, database privacykit, user privacykit,
+# password from MYSQL_PASSWORD below (change both passwords first).
+services:
+  app:
+    depends_on:
+      - db
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: privacykit
+      MYSQL_USER: privacykit
+      MYSQL_PASSWORD: change-me-too
+      MYSQL_ROOT_PASSWORD: change-me
+    volumes:
+      - mysql:/var/lib/mysql
+
+volumes:
+  mysql:

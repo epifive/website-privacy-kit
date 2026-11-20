@@ -1,0 +1,61 @@
+{
+  "name": "website-privacy-kit",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "predev": "node scripts/build-widget.mjs",
+    "dev": "next dev",
+    "prebuild": "node scripts/build-widget.mjs",
+    "build": "next build",
+    "setup": "node scripts/setup.mjs",
+    "prestart": "node scripts/ensure-build.mjs",
+    "start": "next start",
+    "start:server": "node server.js",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "widget:build": "node scripts/build-widget.mjs",
+    "test": "vitest run --maxWorkers=1",
+    "test:watch": "vitest --maxWorkers=1",
+    "test:e2e": "vitest run --maxWorkers=1 --config vitest.e2e.config.ts"
+  },
+  "dependencies": {
+    "kysely": "^0.29.6",
+    "lucide-react": "^1.57.0",
+    "marked": "^18.1.1",
+    "mysql2": "^3.24.6",
+    "next": "16.4.6",
+    "nodemailer": "^10.6.0",
+    "qrcode": "^1.5.4",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "server-only": "^0.0.1",
+    "undici": "^8.12.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/turbopack": "^4",
+    "@types/node": "^22.20.5",
+    "@types/nodemailer": "^8.0.2",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "axe-core": "^4.14.0",
+    "esbuild": "^0.28.2",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.6",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vitest": "^3.2.7"
+  },
+  "description": "EpiFive Website Privacy Kit (Free, open source): DPDP privacy notices in English and Hindi, a purpose-wise consent banner, consent records with a hash chain, rights requests, breach register and retention schedule for Indian websites. Self-hosted. Not legal advice.",
+  "engines": {
+    "node": ">=24.7.0"
+  },
+  "license": "MIT",
+  "author": "EpiFive (https://www.epifive.com)",
+  "homepage": "https://github.com/epifive/website-privacy-kit",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/epifive/website-privacy-kit.git"
+  }
+}

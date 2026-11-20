@@ -1,0 +1,16 @@
+# Build context for the production image (Dockerfile): source only.
+node_modules
+.next
+storage
+tests
+coverage
+*.log
+*.tsbuildinfo
+.env*
+!.env.example
+.git
+.vercel
+Dockerfile
+docker-compose*.yml
+screenshots
+docs
