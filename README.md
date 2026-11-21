@@ -1,5 +1,14 @@
 # EpiFive Website Privacy Kit
 
+<!-- epifive:header -->
+> A self-hosted DPDP toolkit for Indian websites: privacy notices, a consent banner, consent records and a rights-request inbox.
+
+[![Licence: MIT](https://img.shields.io/badge/licence-MIT-0a7560?style=flat-square)](LICENSE)
+[![Latest release](https://img.shields.io/github/v/release/epifive/website-privacy-kit?style=flat-square&label=release&color=4f5bd5)](https://github.com/epifive/website-privacy-kit/releases/latest)
+[![GitHub stars](https://img.shields.io/github/stars/epifive/website-privacy-kit?style=flat-square&color=b5791b)](https://github.com/epifive/website-privacy-kit/stargazers)
+
+**[Docs & guide on epifive.com](https://www.epifive.com/blog/website-privacy-kit-open-source-dpdp-consent-banner?utm_source=github&utm_medium=readme&utm_campaign=website-privacy-kit)** · **[Download the latest release](https://github.com/epifive/website-privacy-kit/releases/latest)** · [Pro edition](https://www.epifive.com/products/website-privacy-kit-pro?utm_source=github&utm_medium=readme&utm_campaign=website-privacy-kit)
+
 **Open-source DPDP toolkit for Indian websites: privacy notices in English and Hindi, a purpose-wise
 consent banner, consent records with a hash chain, a privacy hub with a rights-request inbox, a breach
 register with timers and a retention schedule.** Self-hosted. Built with Next.js 16, React 19 and
@@ -187,3 +196,7 @@ software a Consent Manager.
 ## Licence
 
 [MIT](LICENSE) © 2026 EpiFive
+
+---
+
+<p align="center">Made by <b>EpiFive</b> — <a href="https://www.epifive.com/?utm_source=github&utm_medium=readme&utm_campaign=website-privacy-kit">www.epifive.com</a> · <a href="https://www.epifive.com/open-source?utm_source=github&utm_medium=readme&utm_campaign=website-privacy-kit">more open-source projects</a></p>
